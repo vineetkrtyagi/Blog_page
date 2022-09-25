@@ -14,6 +14,9 @@
         {% endif %}
       </div>
       <h2 class="article-title">{{ object.title }}</h2>
+      {% if object.image %}
+      <img width="500" src="{{ object.image.url }}">
+      {% endif %}
       <p class="article-content">{{ object.content }}</p>
     </div>
   </article>

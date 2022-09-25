@@ -1,5 +1,7 @@
+from urllib import request
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import (
@@ -10,6 +12,7 @@ from django.views.generic import (
     DeleteView,
 )
 from .models import Post
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -45,7 +48,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ["title", "content"]
+    fields = ["title", "content", "image"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -54,7 +57,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ["title", "content"]
+    fields = ["title", "content", "image"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -80,3 +83,25 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, "blog/about.html", {"title": "About"})
+
+def search(request):
+    q = request.GET.get("q")
+    print(q)
+
+    search_posts= Post.objects.filter(Q(title__icontains=q) | Q(content__icontains=q) )
+    paginator= Paginator(search_posts, 4)
+    num = request.GET.get("page") 
+    page_obj= paginator.get_page(num)
+
+
+    data= {
+        "page_obj": page_obj,
+        "q": q
+    }
+
+    return render(request, "blog/search.html", data)
+
+
+
+     
+     
