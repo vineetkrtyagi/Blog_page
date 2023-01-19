@@ -2,3 +2,6 @@ env
 __pycache__
 *.sqlite3
 static
+media/content_pics/
+media/profile_pics/
+.vscode
